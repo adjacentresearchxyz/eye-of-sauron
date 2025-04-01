@@ -33,3 +33,11 @@ source .env && psql $DATABASE_URL -c "COPY (SELECT link FROM sources) TO STDOUT 
 psql $DATABASE_URL -c "COPY (SELECT link FROM sources WHERE relevant_per_human_check = 'yes') TO STDOUT WITH CSV;"
 
 
+To drop other connections
+
+```
+SELECT pg_terminate_backend(pg_stat_activity.pid)
+FROM pg_stat_activity
+WHERE datname = current_database()
+  AND pid <> pg_backend_pid();
+```

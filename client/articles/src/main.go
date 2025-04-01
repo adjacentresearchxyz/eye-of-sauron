@@ -228,7 +228,7 @@ func (a *App) loadSources() error {
 	some method. <https://go.dev/tour/methods/10>
 	*/
 	ctx := context.Background()
-	conn, err := pgx.Connect(ctx, os.Getenv("DATABASE_URL"))
+	conn, err := pgx.Connect(ctx, os.Getenv("DATABASE_POOL_URL"))
 	if err != nil {
 		return fmt.Errorf("failed to connect to database: %v", err)
 	}
