@@ -8,10 +8,10 @@
   - [x] on server => just have a default value of maybe.
   - [x] on client
 - [ ] Use deepseek
-- [ ] Improve similarity metrics for titles to reduce number of duplicates. => good first issue.
+- [x] Improve similarity metrics for titles to reduce number of duplicates. => good first issue.
   - [ ] Chose canonical urls when more than one piece with a similar title is present, both on server and on client.
-  - client/articles/main.go => isSourceRepeat <= más fácil?
-  - server/.../filters.go
+  - [x] client/articles/main.go => isSourceRepeat <= más fácil?
+  - server/.../filters.go => too complicated to order on the server rn
 - [ ] Improve chinese military news prompts and filtering
   - [x] Clean up enough for prod
   - [ ] Make less shy
