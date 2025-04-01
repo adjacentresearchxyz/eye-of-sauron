@@ -1,0 +1,19 @@
+[Unit]
+Description=Prospect news from galerts
+ConditionPathExists=/home/sentinel/news/server
+After=network.target
+
+[Service]
+Type=simple
+User=sentinel
+Group=sentinel
+WorkingDirectory=/home/sentinel/news/server
+ExecStart=/usr/local/go/bin/go run sources/galerts/main.go sources/galerts/filterAndExpandSource.go sources/galerts/saveSource.go sources/galerts/fetchGoogleAlerts.go
+Restart=on-failure
+RestartSec=10
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=galerts
+
+[Install]
+WantedBy=multi-user.target

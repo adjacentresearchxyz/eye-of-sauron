@@ -1,0 +1,10 @@
+## environment vars
+.env
+**/.env
+
+## logs
+**/**.log
+
+## swap files
+*.swp
+

@@ -1,0 +1,63 @@
+-10.0  223  Military attack; clash; assault
+ -9.2  211  Seize position or possessions
+ -8.7  222  Nonmilitary destruction/injury
+ -8.3  221  Noninjury destructive action
+ -7.6  182  Armed force mobilization, exercise, display; military buildup
+ -7.0  195  Break diplomatic relations
+ -7.0  173  Threat with force specified
+ -6.9  174  Ultimatum; threat with negative sanction and time limit
+ -5.8  172  Threat with specific negative nonmilitary sanction
+ -5.6  193  Reduce or cut off aid or assistance; act to punish/deprive
+ -5.2  181  Nonmilitary demonstration, walk out on
+ -5.0  201  Order person or personnel out of country
+ -4.9  202  Expel organization or group
+ -4.9  150  Issue order or command, insist, demand compliance
+ -4.4  171  Threat without specific negative sanction stated
+ -4.4  212  Detain or arrest person(s)
+ -4.1  192  Reduce routine international activity; recall officials
+ -4.0  112  Refuse; oppose; refuse to allow
+ -4.0  111  Turn down proposal; reject protest, demand, threat
+ -3.8  194  Halt negotiation
+ -3.4  122  Denounce; denigrate; abuse
+ -3.0  160  Give warning
+ -2.4  132  Issue formal complaint or protest
+ -2.2  121  Charge; criticize; blame; disapprove
+ -2.2  191  Cancel or postpone planned event
+ -1.9  131  Make complaint (not formal)
+ -1.1  063  Grant asylum
+ -1.1  142  Deny an attributed policy, action, role or position
+ -0.9  141  Deny an accusation
+ -0.2  023  Comment on situation
+ -0.1  102  Urge or suggest action or policy
+ -0.1  021  Explicit decline to comment
+ -0.1  094  Request action; call for
+  0.0  025  Explain or state policy; state future position
+  0.1  091  Ask for information
+  0.6  011  Surrender, yield to order, submit to arrest
+  0.6  012  Yield position; retreat; evacuate
+  1.0  031  Meet with; send note
+  1.2  095  Entreat; plead; appeal to; beg
+  1.5  101  Offer proposal
+  1.8  061  Express regret; apologize
+  1.9  032  Visit; go to
+  1.9  066  Release and/or return persons or property
+  2.0  013  Admit wrongdoing; apologize, retract statement
+  2.5  062  Give state invitation
+  2.8  054  Assure; reassure
+  2.8  033  Receive visit; host
+  2.9  065  Suspend sanctions; end punishment; call truce
+  3.0  082  Agree to future action or procedure, to meet or to negotiate
+  3.4  092  Ask for policy assistance
+  3.4  093  Ask for material assistance
+  3.4  041  Praise, hail, applaud, extend condolences
+  3.6  042  Endorse other's policy or position; give verbal support
+  4.5  053  Promise other future support
+  4.5  051  Promise own policy support
+  5.2  052  Promise material support
+  5.4  064  Grant privilege; diplomatic recognition; de facto relations
+  6.5  073  Give other assistance
+  6.5  081  Make substantive agreement
+  7.4  071  Extend economic aid; give, buy, sell, loan, borrow
+  8.3  072  Extend military assistance
+
+https://web.pdx.edu/~kinsella/jgscale.html

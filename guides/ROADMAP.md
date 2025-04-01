@@ -1,0 +1,140 @@
+## v3
+
+- [ ] Fix cropping after '-' marker when marker is very early on.
+- [x] Add table field to whether marked as relevant or not.
+  - when s, marked as relevant.
+  - yes/no/not marked.
+  - P marks all as *processed*.
+  - [x] on server => just have a default value of maybe.
+  - [x] on client
+- [ ] Use deepseek
+- [ ] Improve similarity metrics for titles to reduce number of duplicates. => good first issue.
+  - [ ] Chose canonical urls when more than one piece with a similar title is present, both on server and on client.
+  - client/articles/main.go => isSourceRepeat <= más fácil?
+  - server/.../filters.go
+- [ ] Improve chinese military news prompts and filtering
+  - [x] Clean up enough for prod
+  - [ ] Make less shy
+  - Borders are important
+  - New capabilities are important
+  - Reasonably time intensive though
+- [ ] Finish twitter parsing integration
+- [ ] Consider various LLM options
+  - Maybe a DeepSeek provider? Much cheaper than OpenAI
+    - But not for Chinese sources
+- [ ] Add more sources. Some options:
+  - [ ] Individual blogs and rss feeds, like those in my minutes
+    - [x] Wikipedia current events. <https://www.to-rss.xyz/wikipedia/current_events/> | <https://en.wikipedia.org/wiki/Portal:Current_events>
+    - [ ] <https://www.who.int/publications/i>
+    - [ ] <https://www.swpc.noaa.gov/> | <https://x.com/NWSSWPC>
+    - [ ] <https://www.dsca.mil/press-media/major-arms-sales> | <https://www.dsca.mil/press-media/major-arms-sales/feed>
+    - [ ] <https://www.whitehouse.gov/briefing-room/statements-releases/feed/>
+    - [ ] <https://news.un.org/en/news>
+    - [ ] <https://www.cdc.gov/bird-flu/spotlights/>
+    - [ ] <https://www.bbc.com/news/topics/cp3mvpdp1r2t>
+    - [ ] <https://globalbiodefense.com/2024/11/10/biodefense-headlines-10-november-2024/>
+    - [ ] <https://research.checkpoint.com/2024/11th-november-threat-intelligence-report/>
+    - [ ] <https://www.cisa.gov/news-events/cybersecurity-advisories>
+    - [ ] <https://freerepublic.com> for more right wing stuff?
+    - [ ] <https://www.globalsecurity.org>
+    - [ ] <https://globalbiodefense.com/2025/02/28/biodefense-headlines-28-february-2025/>
+    - [ ] <https://www.newscatcherapi.com/>
+  - [ ] Forecaster suggestions => this could be a whole thing
+  - [ ] Neuters.de <https://neuters.de/> shows what seems to be the most recent 10K news??
+  - [ ] AP news?
+  - [ ] News API
+  - [ ] Reuters/AP/AFP
+  - [ ] Jihadi Watch
+  - [ ] https://research.checkpoint.com/2024/4th-november-threat-intelligence-report/
+  - [ ] Various press releases, e.g., from US military <https://www.globalsecurity.org/military/library/news/2024/11/mil-241112-dod01.htm>
+
+Improve ops:
+
+- [ ] Automatically deal with logs getting large, including syslogs
+- [ ] Even better deduplication
+  - [ ] Move client dedup & filtering to server
+- [ ] Delete processed items regularly (psql $DATABASE_URL; DELETE from sources WHERE processed = TRUE;)
+   - Middle east, Spain, US, UK, Ukraine, etc. maybe start with no keyword first.
+   - [ ] Added fast way to do this to makefile
+   - ... or not. Maybe leaving old items there is ok, and they could be useful at some point.
+     - maybe also interesting to classify them as useful/not useful to improve filtering
+- [ ] Make filters common for client and server, so that if I add them to client then they are soon after added to server after a git push
+- [ ] Add table for all titles in postgres.
+- [ ] Move filtering earlier, on the server side.
+  - Maybe also add to postgres
+- [ ] Think a bit more about deduplication. Right now we only check for dupes for items which already are in the database. But this means that we can't filter items we have already discarded. So we have a surprising degree of redundancy that would be good to fix.
+  - Maybe save items that pass some initial filters?
+  - Could get large.
+
+## v2
+
+- [x] Research different databases and possible architectures
+- [x] Move output to postgres rather than email for galerts
+- [x] Write client
+- [x] Merge with client directory <https://stackoverflow.com/questions/1425892/how-do-you-merge-two-git-repositories>
+- [x] Move gdelt over to v2
+- [x] Add filtering capabilities to client
+- [x] Delete v1 repo and move v2 over to top level
+- [~] Deduplicate code in various sources once the abstractions become a bit clearer
+  - [x] Reduce deduplication of common code while avoiding early abstractions that later are a bit expensive to get over.
+- [x] Send cropped title to database and check for duplicates based on the filtered title
+- [x] Group items in prospector by keyword, and present them together for ease of process.
+- [x] Add better filtering to the client
+
+## v1 
+
+- [x] Add **GDELT**
+  - [x] Parse events
+  - [x] Parse GKG
+  - [x] Use logs
+  - [x] Refactor prospector for another source
+    - [x] Use mutexes
+  - [x] Add mutexes to prospectArticle function
+- [x] An MVP, or an important initial step: An API that gets an keyword and returns a json with news
+  - [x] Find google news endpoints
+  - [x] Learn how to make requests in go
+  - [x] Convert xml to json for easier parsing
+  - [x] Add a cache, so as to not poke google too much
+- [x] Feed google news to an LLM to summarize them
+  - [x] Explore OpenAI bindings and costs, and check that they are cheap enough
+  - [x] Tricks to use fewer tokens
+    - [x] Feed page to readability.js 
+    - [x] Simplify 
+  - [x] Tricks to get better responses:
+    - [x] Force returning json
+    - [x] Use a more forceful prompt
+- [ ] Add some logging
+  - [x] Add more consistent logging
+  - [x] Log and print to stdout
+- [x] Use a cache 
+  - [x] ~~with a memoizer go package => tried it, but seems inelegant.~~
+  - [x] Just to check if a link has been processed yet.
+- [x] Filter news by relevance/global importance
+  - [x] Craft prompts with examples
+- [x] Add output methods
+  - [x] Add at least one output method
+  - [x] Email
+- [x] Add more keywords
+- [x] Get *something* continuously running
+- [x] Tricks: use neuters.de instead of reuters. Check for other 40x errors.
+- [x] Daemonize with systemd.
+- [x] Fix nil/string error problem
+- [x] Rotate through forecasters' emails to keep the workload manageable?
+  - Workload should also become more manageable after the initial deluge.
+- [x] Send one big email instead of many small ones?
+- [x] Get a sense of the volume of news every day, and think about how to distribute them between forecasters
+- [x] Get fewer repeats. Possible strategies:
+  - [x] Keep list of titles?
+  - Paste everything into one article and then ask GPT itself to remove/combine duplicates?
+    - GPT-4-o
+  - Take the loss?
+  - Use a cheaper model? gpt-3.5-turbo-0125 is 20x cheaper
+  - Ask the model about the title first?
+- [x] Solve concurrency problems
+- [x] Extract prospector into a lib library
+- [x] Give each source its own...
+  - [x] main intro point 
+  - [x] Log
+  - [x] String cache?
+  - [x] Email cache
+  - [x] Systemd service
