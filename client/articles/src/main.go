@@ -138,7 +138,7 @@ func filterSources(sources []Source) ([]Source, error) {
 			filtered_sources = append(filtered_sources, source)
 		} else {
 			log.Printf("Skipped over: %s", source.Title)
-			go markProcessedInSever(true, source.ID)
+			go markProcessedInServer(true, source.ID, source)
 		}
 	}
 	return filtered_sources, nil
@@ -373,7 +373,7 @@ func (a *App) draw() {
 func markRelevantPerHumanCheckInServer(state string, id int) error {
 	flag := true
 	if flag {
-		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 		defer cancel()
 
 		conn, err := pgx.Connect(ctx, os.Getenv("DATABASE_POOL_URL"))
@@ -417,7 +417,7 @@ func (a *App) markRelevantPerHumanCheck(state string, i int) error {
 	return nil
 }
 
-func markProcessedInSever(state bool, id int) error {
+func markProcessedInServer(state bool, id int, source Source) error {
 	flag := true
 	if flag {
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
@@ -433,13 +433,14 @@ func markProcessedInSever(state bool, id int) error {
 		_, err = conn.Exec(ctx, "UPDATE sources SET processed = $1 WHERE id = $2", state, id)
 		if err != nil {
 			log.Printf("failed to mark source as processed: %v", err)
+			log.Printf("source: %v", source)
 			return fmt.Errorf("database update error: %v", err)
 		}
 	}
 	return nil
 }
 
-func (a *App) markProcessed(i int) error {
+func (a *App) markProcessed(i int, source Source) error {
 	if len(a.sources) == 0 {
 		return nil
 	}
@@ -450,9 +451,9 @@ func (a *App) markProcessed(i int) error {
 
 	// Update database asynchronously
 	go func() {
-		err := markProcessedInSever(newState, a.sources[i].ID)
+		err := markProcessedInServer(newState, a.sources[i].ID, source)
 		if err != nil {
-			fmt.Printf("%v", err)
+			log.Printf("%v", err)
 			go func() {
 				a.failureMark = true
 				time.Sleep(2)
@@ -642,7 +643,7 @@ func (a *App) run() error {
 					}
 				case 'm', 'M', 'x':
 					if len(a.sources) > 0 {
-						a.markProcessed(a.selectedIdx)
+						a.markProcessed(a.selectedIdx, a.sources[a.selectedIdx])
 						if a.selectedIdx < len(a.sources)-1 && (a.selectedIdx+1) < (a.currentPage+1)*a.itemsPerPage {
 							a.selectedIdx++
 						} else if (a.currentPage+1)*a.itemsPerPage < len(a.sources) {
@@ -657,7 +658,7 @@ func (a *App) run() error {
 						endIdx = len(a.sources)
 					}
 					for idx := startIdx; idx < endIdx; idx++ {
-						a.markProcessed(idx)
+						a.markProcessed(idx, a.sources[a.selectedIdx])
 					}
 					if (a.currentPage+1)*a.itemsPerPage < len(a.sources) {
 						a.currentPage++
@@ -714,7 +715,7 @@ func (a *App) run() error {
 						var remaining_sources []Source
 						for _, source := range a.sources {
 							if filterRegex.MatchString(source.Title) {
-								go markProcessedInSever(true, source.ID)
+								go markProcessedInServer(true, source.ID, source)
 							} else {
 								remaining_sources = append(remaining_sources, source)
 							}
