@@ -1,3 +1,10 @@
+# github.com/adrg/strutil v0.3.1
+## explicit; go 1.14
+github.com/adrg/strutil
+github.com/adrg/strutil/internal/mathutil
+github.com/adrg/strutil/internal/ngram
+github.com/adrg/strutil/internal/stringutil
+github.com/adrg/strutil/metrics
 # github.com/gdamore/encoding v1.0.0
 ## explicit; go 1.9
 github.com/gdamore/encoding
@@ -79,6 +86,8 @@ github.com/mattn/go-runewidth
 # github.com/rivo/uniseg v0.4.3
 ## explicit; go 1.18
 github.com/rivo/uniseg
+# github.com/stretchr/testify v1.8.4
+## explicit; go 1.20
 # golang.org/x/crypto v0.20.0
 ## explicit; go 1.18
 golang.org/x/crypto/pbkdf2

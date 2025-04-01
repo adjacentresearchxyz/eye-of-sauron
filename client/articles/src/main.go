@@ -22,6 +22,8 @@ import (
 	"github.com/gdamore/tcell/v2"
 	"github.com/jackc/pgx/v4"
 	"github.com/joho/godotenv"
+	"github.com/adrg/strutil/metrics"
+
 )
 
 type Source struct {
@@ -214,6 +216,36 @@ func reorderSources(sources []Source) ([]Source, error) {
 
 }
 
+
+func skipSourcesWithSimilarityMetric(sources []Source) ([]Source, error) {
+	if len(sources) < 2 {
+		return sources, nil
+	}
+
+	new_sources := []Source{sources[0]}
+	last_title := sources[0].Title
+	for i := 1; i < len(sources); i++ {
+		source_i := sources[i]
+		title_i := source_i.Title
+		if len(title_i) > 30 && len(last_title) > 30 {
+			title_i_cropped := title_i[:30]
+			last_title_cropped := last_title[:30]
+			ham := metrics.NewHamming()
+			distance := ham.Distance(title_i_cropped, last_title_cropped)
+			if distance > 4 {
+				new_sources = append(new_sources, source_i)
+				last_title = title_i
+			} else {
+				go markProcessedInServer(true, source_i.ID, source_i)
+			}
+		} else {
+			new_sources = append(new_sources, source_i)
+		}
+	}
+	return new_sources, nil
+	
+}
+
 func (a *App) loadSources() error {
 	/* This syntax is a method in go <https://go.dev/tour/methods/8>
 	the point is to pass a pointer
@@ -262,7 +294,11 @@ func (a *App) loadSources() error {
 	if err != nil {
 		return nil
 	}
-	a.sources = reordered_sources
+	unsimilar_sources, err := skipSourcesWithSimilarityMetric(reordered_sources)
+	if err != nil {
+		return nil
+	}
+	a.sources = unsimilar_sources
 
 	return nil
 }
