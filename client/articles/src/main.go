@@ -223,24 +223,20 @@ func skipSourcesWithSimilarityMetric(sources []Source) ([]Source, error) {
 	}
 
 	new_sources := []Source{sources[0]}
+
 	last_title := sources[0].Title
 	for i := 1; i < len(sources); i++ {
-		source_i := sources[i]
-		title_i := source_i.Title
+		title_i := sources[i].Title
 		if len(title_i) > 30 && len(last_title) > 30 {
-			title_i_cropped := title_i[:30]
-			last_title_cropped := last_title[:30]
-			ham := metrics.NewHamming()
-			distance := ham.Distance(title_i_cropped, last_title_cropped)
-			if distance > 4 {
-				new_sources = append(new_sources, source_i)
-				last_title = title_i
-			} else {
-				go markProcessedInServer(true, source_i.ID, source_i)
-			}
-		} else {
-			new_sources = append(new_sources, source_i)
-		}
+			hamming := metrics.NewHamming()
+			distance := hamming.Distance(title_i[:30], last_title[:30])
+			if distance <= 4 {
+				go markProcessedInServer(true, sources[i].ID, sources[i])
+				continue
+			} 
+			last_title = title_i
+		} 
+		new_sources = append(new_sources, sources[i])
 	}
 	return new_sources, nil
 	
