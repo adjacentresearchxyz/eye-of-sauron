@@ -26,6 +26,7 @@ On this date
 
 # nonactions
 condemns
+concern
 urges
 # OTOH some reporting is only of the reaction
 
@@ -37,6 +38,8 @@ Meghan Markle
 # Summaries
 AP News Summary
 key events
+AP News in Brief
+News in Brief
 
 # Events that popped up a lot
 # but I should eventually discard
