@@ -175,26 +175,41 @@ func readTopicsFromFile(filepath string) ([]Topic, error) {
 
 	for scanner.Scan() {
 		line := scanner.Text()
+		// Skip empty lines and comments
+		if len(line) == 0 || line[0] == '#' {
+			continue
+		}
 		parts := strings.Split(line, ":")
 		if len(parts) != 2 {
 			continue
 		}
 		name := strings.TrimSpace(parts[0])
 		keywords := strings.Split(parts[1], ",")
-		for i := range keywords {
-			keywords[i] = strings.TrimSpace(keywords[i])
+		// Clean up each keyword
+		var cleanKeywords []string
+		for _, k := range keywords {
+			k = strings.TrimSpace(k)
+			if k != "" {
+				cleanKeywords = append(cleanKeywords, k)
+			}
 		}
-		topics = append(topics, Topic{name: name, keywords: keywords})
+		if len(cleanKeywords) > 0 {
+			topics = append(topics, Topic{name: name, keywords: cleanKeywords})
+		}
 	}
 
-	return topics, scanner.Err()
+	if err := scanner.Err(); err != nil {
+		return nil, err
+	}
+
+	return topics, nil
 }
 
 func reorderSources(sources []Source) ([]Source, error) {
 	var reordered_sources []Source
 	remaining_sources := sources
 
-	topics, err := readTopicsFromFile("topics.txt")
+	topics, err := readTopicsFromFile("src/topics.txt")
 	if err != nil {
 		log.Printf("Error loading topics: %v", err)
 		return sources, err

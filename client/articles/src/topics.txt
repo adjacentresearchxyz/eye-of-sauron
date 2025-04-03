@@ -1,18 +1,18 @@
-iran: Iran, Ayatollah, Tehran
-gaza: Gaza, Palestine, Hamas
-israel: Israel, Netanyahu
-yemen: Yemen, Houthi
-lebanon: Lebanon, Hezbollah
-middle_east: Syria, Middle East, Qatar, Afghanistan, Saudi
-south_asia: China, Taiwan, Philippine, Korea
-africa: Sudan, Africa, Nigeria
-eastern_europe: Russia, Ukraine, Crimea, Belarus, Bulgaria, Moskow, Putin, Kremlin
-hindustan: India, Balochistan, Pakistan, Bangladesh
-conflict: War, blockade, invasion, military exercise, cyberattack, attack, bomber, terror
-alert: Emergency, disaster, alert
-bio: human-to-human, pandemic, mystery pneumonia, covid, h5n1, coronavirus, health, hospital, dengue, mpox, flu, vaccine, virus, antibiotic
-ai: openai
-europe: UK, France, French, British, Spain, Spanish, German
-nuclear: nuclear
-us: Trump
-low_level_threat: hurricane, flood, climate change, school shooting, fire, storm, fentanyl, \s\d\d killed, hot
+Iran: Iran, Ayatollah, Tehran
+Gaza: Gaza, Palestine, Hamas
+Israel: Israel, Netanyahu
+Yemen: Yemen, Houthi
+Lebanon: Lebanon, Hezbollah
+Middle East: Syria, Middle East, Qatar, Afghanistan, Saudi
+South Asia: China, Taiwan, Philippine, Korea
+Africa: Sudan, Africa, Nigeria
+Eastern Europe: Russia, Ukraine, Crimea, Belarus, Bulgaria, Moskow, Putin, Kremlin
+Hindustan: India, Balochistan, Pakistan, Bangladesh
+Conflict: War, blockade, invasion, military exercise, cyberattack, attack, bomber, terror
+Alert: Emergency, disaster, alert
+Bio: human-to-human, pandemic, mystery pneumonia, covid, h5n1, coronavirus, health, hospital, dengue, mpox, flu, vaccine, virus, antibiotic
+Ai: openai
+Europe: UK, France, French, British, Spain, Spanish, German
+Nuclear: nuclear
+US: Trump, US
+Low level threat: hurricane, flood, climate change, school shooting, fire, storm, fentanyl, \s\d\d killed, hot
