@@ -24,7 +24,6 @@ import (
 	"github.com/jackc/pgx/v4"
 	"github.com/joho/godotenv"
 	"github.com/adrg/strutil/metrics"
-
 )
 
 type Source struct {
@@ -55,6 +54,11 @@ type App struct {
 	failureMark    bool
 	waitgroup      sync.WaitGroup
 	statusMessage  string
+}
+
+type Topic struct {
+	name     string
+	keywords []string
 }
 
 func newApp() (*App, error) {
@@ -157,50 +161,56 @@ func filterSourcesForUnread(sources []Source) []Source {
 		}
 	}
 	return unread_sources
+}
 
+func readTopicsFromFile(filepath string) ([]Topic, error) {
+	file, err := os.Open(filepath)
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+
+	var topics []Topic
+	scanner := bufio.NewScanner(file)
+
+	for scanner.Scan() {
+		line := scanner.Text()
+		parts := strings.Split(line, ":")
+		if len(parts) != 2 {
+			continue
+		}
+		name := strings.TrimSpace(parts[0])
+		keywords := strings.Split(parts[1], ",")
+		for i := range keywords {
+			keywords[i] = strings.TrimSpace(keywords[i])
+		}
+		topics = append(topics, Topic{name: name, keywords: keywords})
+	}
+
+	return topics, scanner.Err()
 }
 
 func reorderSources(sources []Source) ([]Source, error) {
-
 	var reordered_sources []Source
 	remaining_sources := sources
 
-	//
-	type strings []string
-	iran_strings := strings{"Iran", "Ayatollah", "Tehran"}
-	gaza_strings := strings{"Gaza", "Palestine", "Hamas"}
-	israel_strings := strings{"Israel", "Netanyahu"}
-	yemen_strings := strings{"Yemen", "Houthi"}
-	lebanon_strings := strings{"Lebanon", "Hezbollah"}
-	middle_east_regex_strings := strings{ "Syria", "Middle East", "Qatar", "Afghanistan",  "Saudi" }
-	south_asia_regex_strings := strings{"China", "Taiwan", "Philippine", "Korea"}
-	africa_strings := strings{"Sudan", "Africa", "Nigeria"}
-	eastern_europe_strings := strings{"Russia", "Ukraine", "Crimea", "Belarus", "Bulgaria", "Moskow", "Putin", "Kremlin"}
-	hindustan_strings := strings{"India", "Balochistan", "Pakistan", "Bangladesh"}
-	conflict_strings := strings{"War", "blockade", "invasion", "military exercise", "cyberattack", "attack", "bomber", "terror"}
-	alert_strings := strings{"Emergency", "disaster", "alert"}
-	bio_strings := strings{"human-to-human", "pandemic", "mystery pneumonia", "covid", "h5n1", "coronavirus", "health", "hospital", "dengue", "mpox", "flu", "vaccine", "virus", "antibiotic"}
-	ai_strings := strings{"openai"}
-	europe_strings := strings{"UK", "France", "French", "British", "Spain", "Spanish", "German"}
-	nuclear_strings := strings{"nuclear"}
-	us_strings := strings{"Trump"}
-	low_level_threat_strings := strings{"hurricane", "flood", "climate change", "school shooting", "fire", "storm", "fentanyl", "\\s\\d\\d killed", "hot"}
-	// other: "undersea cables", "carrington event", "kessler syndrome", "NATO", "Trump"
-	// there is some danger in preconceptualized concepts here.
-	// TODO: move to file which is parsed
-	// TODO: add reload
+	topics, err := readTopicsFromFile("topics.txt")
+	if err != nil {
+		log.Printf("Error loading topics: %v", err)
+		return sources, err
+	}
 
-	topics := []strings{iran_strings, gaza_strings, yemen_strings, israel_strings, yemen_strings, lebanon_strings, middle_east_regex_strings, south_asia_regex_strings, eastern_europe_strings, conflict_strings, alert_strings, bio_strings, ai_strings, nuclear_strings, europe_strings, hindustan_strings, africa_strings, us_strings, low_level_threat_strings}
 	for _, topic := range topics {
 		var topic_regexes []*regexp.Regexp
-		for _, regex_string := range topic {
-			regex, err := regexp.Compile("(?i)" + regex_string) // make case insensitive
+		for _, regex_string := range topic.keywords {
+			regex, err := regexp.Compile("(?i)" + regex_string)
 			if err != nil {
 				log.Printf("Regex err: %v", err)
-				return nil, err // Consider how to handle partial success
+				return nil, err
 			}
 			topic_regexes = append(topic_regexes, regex)
 		}
+
 		var new_remaining_sources []Source
 		var topic_sources []Source
 		for _, source := range remaining_sources {
@@ -218,11 +228,10 @@ func reorderSources(sources []Source) ([]Source, error) {
 		reordered_sources = append(reordered_sources, topic_sources...)
 		remaining_sources = new_remaining_sources
 	}
+
 	reordered_sources = append(remaining_sources, reordered_sources...)
 	return reordered_sources, nil
-
 }
-
 
 func skipSourcesWithSimilarityMetric(sources []Source) ([]Source, error) {
 	if len(sources) < 2 {
@@ -246,7 +255,6 @@ func skipSourcesWithSimilarityMetric(sources []Source) ([]Source, error) {
 		new_sources = append(new_sources, sources[i])
 	}
 	return new_sources, nil
-	
 }
 
 func (a *App) loadSources() error {
@@ -312,7 +320,6 @@ func padStringWithWhitespace(s string, n int) string {
 	}
 	padding := strings.Repeat(" ", n-len(s))
 	return s + padding
-
 }
 
 func (a *App) draw() {
