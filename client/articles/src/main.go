@@ -18,6 +18,7 @@ import (
 
 	"html"
 	"strings"
+	"sync"
 
 	"github.com/gdamore/tcell/v2"
 	"github.com/jackc/pgx/v4"
@@ -52,6 +53,7 @@ type App struct {
 	currentPage    int
 	itemsPerPage   int
 	failureMark    bool
+	waitgroup      sync.WaitGroup
 	statusMessage  string
 }
 
@@ -433,7 +435,9 @@ func (a *App) markRelevantPerHumanCheck(state string, i int) error {
 	a.sources[i].RelevantPerHumanCheck = state
 
 	// Update database asynchronously
+	a.waitgroup.Add(1)
 	go func() {
+		defer a.waitgroup.Done()
 		err := markRelevantPerHumanCheckInServer(state, a.sources[i].ID)
 		if err != nil {
 			fmt.Printf("%v", err)
@@ -482,7 +486,9 @@ func (a *App) markProcessed(i int, source Source) error {
 	a.sources[i].Processed = newState
 
 	// Update database asynchronously
+	a.waitgroup.Add(1)
 	go func() {
+		defer a.waitgroup.Done()
 		err := markProcessedInServer(newState, a.sources[i].ID, source)
 		if err != nil {
 			log.Printf("%v", err)
@@ -664,6 +670,7 @@ func (a *App) run() error {
 			case tcell.KeyRune:
 				switch ev.Rune() {
 				case 'q', 'Q':
+					a.waitgroup.Wait() // gracefully wait for all goroutines to finish
 					return nil
 				case 'o', 'O':
 					if len(a.sources) > 0 {
