@@ -167,7 +167,12 @@ func reorderSources(sources []Source) ([]Source, error) {
 
 	//
 	type strings []string
-	middle_east_regex_strings := strings{"Israel", "Lebanon", "Syria", "Hezbollah", "Hamas", "Gaza", "Middle East", "Iran", "Qatar", "Afghanistan", "Palestine", "Saudi", "Yemen", "Houthi", "Tehran"}
+	iran_strings := strings{"Iran", "Ayatollah", "Tehran"}
+	gaza_strings := strings{"Gaza", "Palestine", "Hamas"}
+	israel_strings := strings{"Israel", "Netanyahu"}
+	yemen_strings := strings{"Yemen", "Houthi"}
+	lebanon_strings := strings{"Lebanon", "Hezbollah"}
+	middle_east_regex_strings := strings{ "Syria", "Middle East", "Qatar", "Afghanistan",  "Saudi" }
 	south_asia_regex_strings := strings{"China", "Taiwan", "Philippine", "Korea"}
 	africa_strings := strings{"Sudan", "Africa", "Nigeria"}
 	eastern_europe_strings := strings{"Russia", "Ukraine", "Crimea", "Belarus", "Bulgaria", "Moskow", "Putin", "Kremlin"}
@@ -185,7 +190,7 @@ func reorderSources(sources []Source) ([]Source, error) {
 	// TODO: move to file which is parsed
 	// TODO: add reload
 
-	topics := []strings{middle_east_regex_strings, south_asia_regex_strings, eastern_europe_strings, conflict_strings, alert_strings, bio_strings, ai_strings, nuclear_strings, europe_strings, hindustan_strings, africa_strings, us_strings, low_level_threat_strings}
+	topics := []strings{iran_strings, gaza_strings, yemen_strings, israel_strings, yemen_strings, lebanon_strings, middle_east_regex_strings, south_asia_regex_strings, eastern_europe_strings, conflict_strings, alert_strings, bio_strings, ai_strings, nuclear_strings, europe_strings, hindustan_strings, africa_strings, us_strings, low_level_threat_strings}
 	for _, topic := range topics {
 		var topic_regexes []*regexp.Regexp
 		for _, regex_string := range topic {
