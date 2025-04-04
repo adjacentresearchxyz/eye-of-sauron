@@ -1,37 +1,53 @@
-sudo apt install postgresql postgresql-client
+## Installation on debian
 
+Install libraries:
+
+```
+sudo apt install postgresql postgresql-client
+```
+
+
+Some local commands:
+
+```
 sudo -u postgres createuser nuno
 sudo -u postgres createdb -O nuno nuno
 # sudo -u postgres createuser galadriel
 # sudo -u postgres -i
-
 psql
 psql -d nuno -h localhost -U nuno
-
-# https://github.com/jackc/pgx/wiki/Getting-started-with-pgx
-go get github.com/jackc/pgx
 DATABASE_URL=postgresql://localhost:5432
+```
 
-https://cloud.digitalocean.com/databases/dbe5b6ad-dca6-458f-924f-139700ae2414/pools?i=3b1212
+command to log into psql database:
 
-Later: Look into Connection pools
 
+```
+source .env 
+psql $DATABASE_POOL_URL
+```
+
+create and alter tables:
+
+```
 psql $DATABASE_URL -c "CREATE TABLE IF NOT EXISTS sources (id SERIAL PRIMARY KEY, title TEXT NOT NULL, link TEXT NOT NULL UNIQUE, date TIMESTAMP NOT NULL, summary TEXT, importance_bool BOOLEAN, importance_reasoning TEXT, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP);"
-
-psql $DATABASE
-
 ALTER TABLE sources ADD COLUMN "processed" BOOLEAN DEFAULT FALSE;
 ALTER TABLE sources ADD COLUMN "relevant_per_human_check" TEXT DEFAULT 'maybe';
+```
+
 
 psql $DATABASE_URL -f filename.sql
 
+
+```
 psql $DATABASE_URL -c "SELECT link FROM sources WHERE created_at < NOW() - INTERVAL '2 weeks';"
 psql $DATABASE_URL -c "COPY (SELECT link FROM sources WHERE created_at < NOW() - INTERVAL '2 weeks') TO STDOUT WITH CSV;"
-
 source .env && psql $DATABASE_URL -c "COPY (SELECT link FROM sources) TO STDOUT WITH CSV;" | grep gmw.cn
-
 psql $DATABASE_URL -c "COPY (SELECT link FROM sources WHERE relevant_per_human_check = 'yes') TO STDOUT WITH CSV;"
-
+psql $DATABASE_URL -c "COPY () TO STDOUT WITH CSV;"
+psql $DATABASE_URL -c "SELECT id, title, link, date, created_at, processed FROM sources WHERE EXTRACT(MONTH FROM date) = $1 AND processed = false ORDER BY date ASC, id ASC"
+psql $DATABASE_URL -c "COPY (SELECT title FROM sources WHERE EXTRACT(MONTH FROM date) = 3) TO STDOUT WITH CSV;"
+```
 
 To drop other connections
 
