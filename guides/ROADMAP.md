@@ -25,6 +25,7 @@
 - [ ] Add more sources. Some options:
   - [ ] Individual blogs and rss feeds, like those in my minutes
     - [x] Wikipedia current events. <https://www.to-rss.xyz/wikipedia/current_events/> | <https://en.wikipedia.org/wiki/Portal:Current_events>
+    - [ ] <https://disasterphilanthropy.org/blog/what-were-watching-weekly-disaster-update-march-31/>
     - [ ] <https://www.who.int/publications/i>
     - [ ] <https://www.swpc.noaa.gov/> | <https://x.com/NWSSWPC>
     - [ ] <https://www.dsca.mil/press-media/major-arms-sales> | <https://www.dsca.mil/press-media/major-arms-sales/feed>

@@ -206,46 +206,52 @@ func readTopicsFromFile(filepath string) ([]Topic, error) {
 }
 
 func reorderSources(sources []Source) ([]Source, error) {
-	var reordered_sources []Source
-	remaining_sources := sources
+    var reordered_sources []Source
+    remaining_sources := sources
 
-	topics, err := readTopicsFromFile("src/topics.txt")
-	if err != nil {
-		log.Printf("Error loading topics: %v", err)
-		return sources, err
-	}
+    topics, err := readTopicsFromFile("src/topics.txt")
+    if err != nil {
+        log.Printf("Error loading topics: %v", err)
+        return sources, err
+    }
 
-	for _, topic := range topics {
-		var topic_regexes []*regexp.Regexp
-		for _, regex_string := range topic.keywords {
-			regex, err := regexp.Compile("(?i)" + regex_string)
-			if err != nil {
-				log.Printf("Regex err: %v", err)
-				return nil, err
-			}
-			topic_regexes = append(topic_regexes, regex)
-		}
+    for _, topic := range topics {
+        var topic_regexes []*regexp.Regexp
+        for _, regex_string := range topic.keywords {
+            regex, err := regexp.Compile("(?i)" + regex_string)
+            if err != nil {
+                log.Printf("Regex error: %v", err)
+                return nil, err
+            }
+            topic_regexes = append(topic_regexes, regex)
+        }
 
-		var new_remaining_sources []Source
-		var topic_sources []Source
-		for _, source := range remaining_sources {
-			match := testStringAgainstRegexes(topic_regexes, source.Title)
-			if match {
-				topic_sources = append(topic_sources, source)
-			} else {
-				new_remaining_sources = append(new_remaining_sources, source)
-			}
-		}
+        var new_remaining_sources []Source
+        var topic_sources []Source
+        for _, source := range remaining_sources {
+            match := testStringAgainstRegexes(topic_regexes, source.Title)
+            if match {
+                topic_sources = append(topic_sources, source)
+            } else {
+                new_remaining_sources = append(new_remaining_sources, source)
+            }
+        }
 
-		sort.Slice(topic_sources[:], func(i, j int) bool {
-			return topic_sources[i].Title < topic_sources[j].Title
-		})
-		reordered_sources = append(reordered_sources, topic_sources...)
-		remaining_sources = new_remaining_sources
-	}
+        // Sort the topic_sources alphabetically by title
+        sort.Slice(topic_sources, func(i, j int) bool {
+            return topic_sources[i].Title < topic_sources[j].Title
+        })
+        reordered_sources = append(reordered_sources, topic_sources...)
+        remaining_sources = new_remaining_sources
+    }
 
-	reordered_sources = append(remaining_sources, reordered_sources...)
-	return reordered_sources, nil
+    // Append remaining sources that didn't fit into any topic, sorted alphabetically
+    sort.Slice(remaining_sources, func(i, j int) bool {
+        return remaining_sources[i].Title < remaining_sources[j].Title
+    })
+    reordered_sources = append(reordered_sources, remaining_sources...)
+
+    return reordered_sources, nil
 }
 
 func skipSourcesWithSimilarityMetric(sources []Source) ([]Source, error) {

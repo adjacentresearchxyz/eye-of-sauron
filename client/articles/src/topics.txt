@@ -5,7 +5,9 @@ Yemen: Yemen, Houthi
 Lebanon: Lebanon, Hezbollah
 Middle East: Syria, Middle East, Qatar, Afghanistan, Saudi
 South Asia: China, Taiwan, Philippine, Korea
-Africa: Sudan, Africa, Nigeria
+South Sudan: South Sudan
+Sudan: Sudan
+Nigeria: Nigeria
 Eastern Europe: Russia, Ukraine, Crimea, Belarus, Bulgaria, Moskow, Putin, Kremlin
 Hindustan: India, Balochistan, Pakistan, Bangladesh
 Conflict: War, blockade, invasion, military exercise, cyberattack, attack, bomber, terror
