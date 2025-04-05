@@ -12,7 +12,7 @@ import (
 )
 
 func SaveSource(source types.ExpandedSource) {
-	conn, err := pgx.Connect(context.Background(), os.Getenv("DATABASE_URL"))
+	conn, err := pgx.Connect(context.Background(), os.Getenv("DATABASE_POOL_URL"))
 	if err != nil {
 		log.Printf("Unable to connect to database: %v\n", err)
 		return

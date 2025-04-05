@@ -24,7 +24,7 @@ func main() {
 		log.Fatal("Error loading .env file")
 	}
 	openai_key := os.Getenv("OPENAI_KEY")
-	pg_database_url := os.Getenv("DATABASE_URL")
+	pg_database_url := os.Getenv("DATABASE_POOL_URL")
 
 	keywords := []string{"War", "Emergency", "disaster", "alert", "nuclear", "combat duty", "human-to-human", "pandemic", "blockade", "invasion", "undersea cables", "nuclear", "Carrington event", "mystery pneumonia", "Taiwan", "Ukraine", "OpenAI announces AGI", "AI rights", "military exercise", "Kessler syndrome", "Cyberattack"}
 	for true {

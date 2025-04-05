@@ -25,7 +25,7 @@ func main() {
 		log.Fatal("Error loading .env file")
 	}
 	openai_key := os.Getenv("OPENAI_KEY")
-	pg_database_url := os.Getenv("DATABASE_URL")
+	pg_database_url := os.Getenv("DATABASE_POOL_URL")
 
 	// Search gkg
 	ticker_gkg := time.NewTicker(15 * time.Minute)
