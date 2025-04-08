@@ -35,13 +35,17 @@ ALTER TABLE sources ADD COLUMN "processed" BOOLEAN DEFAULT FALSE;
 ALTER TABLE sources ADD COLUMN "relevant_per_human_check" TEXT DEFAULT 'maybe';
 ```
 
-
-psql $DATABASE_URL -f filename.sql
-
+To read a command from a file:
 
 ```
-psql $DATABASE_URL -c "SELECT link FROM sources WHERE created_at < NOW() - INTERVAL '2 weeks';"
-psql $DATABASE_URL -c "COPY (SELECT link FROM sources WHERE created_at < NOW() - INTERVAL '2 weeks') TO STDOUT WITH CSV;"
+psql $DATABASE_URL -f filename.sql
+```
+
+Some useful commands:
+
+```
+psql $DATABASE_POOL_URL -c "SELECT link FROM sources WHERE created_at > NOW() - INTERVAL '2 weeks';"
+psql $DATABASE_URL -c "COPY (SELECT link FROM sources WHERE created_at > NOW() - INTERVAL '2 weeks') TO STDOUT WITH CSV;"
 source .env && psql $DATABASE_URL -c "COPY (SELECT link FROM sources) TO STDOUT WITH CSV;" | grep gmw.cn
 psql $DATABASE_URL -c "COPY (SELECT link FROM sources WHERE relevant_per_human_check = 'yes') TO STDOUT WITH CSV;"
 psql $DATABASE_URL -c "COPY () TO STDOUT WITH CSV;"

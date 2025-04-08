@@ -1,5 +1,6 @@
 ## v3
 
+- [ ] Move server to using eye of sauron repo
 - [ ] Fix cropping after '-' marker when marker is very early on.
 - [x] Add table field to whether marked as relevant or not.
   - when s, marked as relevant.
@@ -25,6 +26,7 @@
 - [ ] Add more sources. Some options:
   - [ ] Individual blogs and rss feeds, like those in my minutes
     - [x] Wikipedia current events. <https://www.to-rss.xyz/wikipedia/current_events/> | <https://en.wikipedia.org/wiki/Portal:Current_events>
+    - [ ] <https://iris.who.int/handle/10665/1642/browse?type=dateissued&order=DESC>
     - [ ] <https://disasterphilanthropy.org/blog/what-were-watching-weekly-disaster-update-march-31/>
     - [ ] <https://www.who.int/publications/i>
     - [ ] <https://www.swpc.noaa.gov/> | <https://x.com/NWSSWPC>
