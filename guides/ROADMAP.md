@@ -1,6 +1,6 @@
 ## v3
 
-- [ ] Move server to using eye of sauron repo
+- [x] Move server to using eye of sauron repo
 - [ ] Fix cropping after '-' marker when marker is very early on.
 - [x] Add table field to whether marked as relevant or not.
   - when s, marked as relevant.
