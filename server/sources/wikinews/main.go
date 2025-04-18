@@ -3,60 +3,85 @@ package main
 import (
 	"log"
 	"os"
-	"io"
+	"strconv"
 	"time"
 
 	"github.com/joho/godotenv"
 	"git.nunosempere.com/NunoSempere/news/lib/types"
+	"eye-of-sauron/server/lib/logger"
 )
 
-func main() {
-	// Set up logging
-	logFile, err := os.OpenFile("sources/wikinews/v2.log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
-	if err != nil {
-		log.Fatalf("error opening file: %v", err)
+var (
+	logger *logger.Logger
+)
+
+// Helper function to get environment variable with default value
+func getEnvWithDefault(key, defaultValue string) string {
+	value := os.Getenv(key)
+	if value == "" {
+		return defaultValue
 	}
-	defer logFile.Close()
-	mw := io.MultiWriter(os.Stdout, logFile)
-	log.SetOutput(mw)
+	return value
+}
+
+func main() {
+	// Initialize logging
+	logPath := "sources/wikinews/v2.log"
+	maxSize, _ := strconv.Atoi(getEnvWithDefault("LOG_MAX_SIZE", "10"))
+	maxBackups, _ := strconv.Atoi(getEnvWithDefault("LOG_MAX_BACKUPS", "5"))
+	maxAge, _ := strconv.Atoi(getEnvWithDefault("LOG_MAX_AGE", "30"))
+	minLevel := logger.GetLogLevelFromString(getEnvWithDefault("LOG_LEVEL", "INFO"))
+
+	var err error
+	logger, err = logger.NewLogger("WIKINEWS", logPath, maxSize, maxBackups, maxAge, minLevel)
+	if err != nil {
+		log.Fatalf("Failed to initialize logger: %v", err)
+	}
 
 	// Load environment variables
-	err = godotenv.Load()
+	err = godotenv.Load("../../.env")  // Look for .env in root directory
 	if err != nil {
-		log.Fatal("Error loading .env file")
+		err = godotenv.Load("../.env")  // Try one level up
+		if err != nil {
+			err = godotenv.Load(".env")  // Try current directory as fallback
+			if err != nil {
+				logger.Error("Error loading .env file")
+				os.Exit(1)
+			}
+		}
 	}
 	openai_key := os.Getenv("OPENAI_KEY")
 	pg_database_url := os.Getenv("DATABASE_POOL_URL")
 
 	for {
-		log.Println("Starting Wikipedia current events processing")
+		logger.Info("Starting Wikipedia current events processing")
 		rssURL := "https://www.to-rss.xyz/wikipedia/current_events/"
 		
 		link, err := ExtractCurrentEventsLink(rssURL)
 		if err != nil {
-			log.Printf("Error extracting current events link: %v", err)
+			logger.Error("Error extracting current events link: %v", err)
 			continue
 		}
 		if link == "" {
-			log.Printf("No current events link found")
+			logger.Warning("No current events link found")
 			continue
 		}
-		log.Printf("Current events link: %s", link)
+		logger.Info("Current events link: %s", link)
 		
 		// Fetch the content
 		content, err := FetchCurrentEvents(link)
 		if err != nil {
-			log.Printf("Error fetching current events: %v", err)
+			logger.Error("Error fetching current events: %v", err)
 			continue
 		}
 		
 		// Extract and process external links
 		externalLinks := ExtractExternalLinks(content)
-		log.Printf("Found %d external news source links", len(externalLinks))
+		logger.Info("Found %d external news source links", len(externalLinks))
 		
 		// Process each external link
 		for i, extLink := range externalLinks {
-			log.Printf("\nProcessing link %d/%d: %s", i+1, len(externalLinks), extLink)
+			logger.Info("Processing link %d/%d: %s", i+1, len(externalLinks), extLink)
 			source := types.Source{
 				Title: extLink,
 				Link:  extLink,
@@ -68,7 +93,7 @@ func main() {
 			}
 		}
 
-		log.Printf("Finished processing current events, sleeping for 24 hours")
+		logger.Info("Finished processing current events, sleeping for 24 hours")
 		time.Sleep(12 * time.Hour)
 	}
 }
