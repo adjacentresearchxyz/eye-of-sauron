@@ -123,8 +123,8 @@ func testStringAgainstRegexes(rs []*regexp.Regexp, s string) bool {
 func isSourceRepeat(i int, sources []Source) bool {
 	// TODO: maybe make this a bit more sophisticated, and mark as repeat even if they are not exactly the same but
 	// also if they are pretty near according to some measure of distance
-	for j, _ := range sources {
-		if i != j && strings.ToUpper(cleanTitle(sources[i].Title)) == strings.ToUpper(cleanTitle(sources[j].Title)) {
+	for j := range sources {
+		if i != j && strings.ToUpper(sources[i].Title) == strings.ToUpper(sources[j].Title) {
 			return true
 		}
 	}
@@ -206,52 +206,52 @@ func readTopicsFromFile(filepath string) ([]Topic, error) {
 }
 
 func reorderSources(sources []Source) ([]Source, error) {
-    var reordered_sources []Source
-    remaining_sources := sources
+	var reordered_sources []Source
+	remaining_sources := sources
 
-    topics, err := readTopicsFromFile("src/topics.txt")
-    if err != nil {
-        log.Printf("Error loading topics: %v", err)
-        return sources, err
-    }
+	topics, err := readTopicsFromFile("src/topics.txt")
+	if err != nil {
+		log.Printf("Error loading topics: %v", err)
+		return sources, err
+	}
 
-    for _, topic := range topics {
-        var topic_regexes []*regexp.Regexp
-        for _, regex_string := range topic.keywords {
-            regex, err := regexp.Compile("(?i)" + regex_string)
-            if err != nil {
-                log.Printf("Regex error: %v", err)
-                return nil, err
-            }
-            topic_regexes = append(topic_regexes, regex)
-        }
+	for _, topic := range topics {
+		var topic_regexes []*regexp.Regexp
+		for _, regex_string := range topic.keywords {
+			regex, err := regexp.Compile("(?i)" + regex_string)
+			if err != nil {
+				log.Printf("Regex error: %v", err)
+				return nil, err
+			}
+			topic_regexes = append(topic_regexes, regex)
+		}
 
-        var new_remaining_sources []Source
-        var topic_sources []Source
-        for _, source := range remaining_sources {
-            match := testStringAgainstRegexes(topic_regexes, source.Title)
-            if match {
-                topic_sources = append(topic_sources, source)
-            } else {
-                new_remaining_sources = append(new_remaining_sources, source)
-            }
-        }
+		var new_remaining_sources []Source
+		var topic_sources []Source
+		for _, source := range remaining_sources {
+			match := testStringAgainstRegexes(topic_regexes, source.Title)
+			if match {
+				topic_sources = append(topic_sources, source)
+			} else {
+				new_remaining_sources = append(new_remaining_sources, source)
+			}
+		}
 
-        // Sort the topic_sources alphabetically by title
-        sort.Slice(topic_sources, func(i, j int) bool {
-            return topic_sources[i].Title < topic_sources[j].Title
-        })
-        reordered_sources = append(reordered_sources, topic_sources...)
-        remaining_sources = new_remaining_sources
-    }
+		// Sort the topic_sources alphabetically by title
+		sort.Slice(topic_sources, func(i, j int) bool {
+			return topic_sources[i].Title < topic_sources[j].Title
+		})
+		reordered_sources = append(reordered_sources, topic_sources...)
+		remaining_sources = new_remaining_sources
+	}
 
-    // Append remaining sources that didn't fit into any topic, sorted alphabetically
-    sort.Slice(remaining_sources, func(i, j int) bool {
-        return remaining_sources[i].Title < remaining_sources[j].Title
-    })
-    reordered_sources = append(reordered_sources, remaining_sources...)
+	// Append remaining sources that didn't fit into any topic, sorted alphabetically
+	sort.Slice(remaining_sources, func(i, j int) bool {
+		return remaining_sources[i].Title < remaining_sources[j].Title
+	})
+	reordered_sources = append(reordered_sources, remaining_sources...)
 
-    return reordered_sources, nil
+	return reordered_sources, nil
 }
 
 func skipSourcesWithSimilarityMetric(sources []Source) ([]Source, error) {
@@ -270,9 +270,9 @@ func skipSourcesWithSimilarityMetric(sources []Source) ([]Source, error) {
 			if distance <= 4 {
 				go markProcessedInServer(true, sources[i].ID, sources[i])
 				continue
-			} 
+			}
 			last_title = title_i
-		} 
+		}
 		new_sources = append(new_sources, sources[i])
 	}
 	return new_sources, nil
@@ -589,21 +589,9 @@ func (a *App) saveToFile(source Source) error {
 	return nil
 }
 
+// This is intentionally empty - title cleaning is now handled server-side
 func cleanTitle(s string) string {
 	return s
-	/*
-	n := 10
-	if len(s) < n {
-		return s
-	} 
-
-	if pos := strings.LastIndex(s[len(s)-n:], " – "); pos != -1 {
-		if pos > n {
-			return s[:len(s)-n+pos]
-		}
-	} 
-	return s
-	*/
 }
 
 func (a *App) webSearch(source Source) {
@@ -895,9 +883,18 @@ func main() {
 	mw := io.Writer(logFile)
 	log.SetOutput(mw)
 
-	if err := godotenv.Load(); err != nil {
-		log.Fatal("Error loading .env file")
+	// Load environment variables from root directory
+	err = godotenv.Load("../../.env")  // Look for .env in root directory
+	if err != nil {
+		err = godotenv.Load("../.env")  // Try one level up
+		if err != nil {
+			err = godotenv.Load(".env")  // Try current directory as fallback
+			if err != nil {
+				log.Fatal("Error loading .env file")
+			}
+		}
 	}
+
 	app, err := newApp()
 	if err != nil {
 		log.Fatalf("Could not create app: %v", err)
