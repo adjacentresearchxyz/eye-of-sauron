@@ -58,12 +58,14 @@ func IsGoodHost(source types.Source) bool {
 func CleanTitle0(s string, endingMarker string) string {
 	// endingMarkers: "-", "|"
 	result := s
-	if len(result) > 25 {
-		// Logic seems good, but some titles are abridged somehow.
-		if pos := strings.LastIndex(s[25:], endingMarker); pos != -1 {
-			result = s[:25+pos]
-		}
+	
+	// Only crop if the title is long enough to be meaningful after cropping
+	minLengthBeforeMarker := 15 // Ensure we have a meaningful title
+	
+	if pos := strings.Index(s, endingMarker); pos != -1 && pos >= minLengthBeforeMarker {
+		result = s[:pos]
 	}
+	
 	return result
 }
 
@@ -74,7 +76,6 @@ func CleanTitle(s string) string {
 	s5 := strings.TrimSpace(s4)
 	return s5
 }
-
 
 /*
 func main(){
